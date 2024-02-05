@@ -150,4 +150,30 @@ module.exports = {
       return await model.count({ where: { id } })
     }
   },
+  myFileExt: (filename) => /(?:\.([^.]+))?$/.exec(filename)[1],
+  myFileUploader: (file, dir) => {
+    const ext = /(?:\.([^.]+))?$/.exec(file.name)[1]
+    profile_picture = `${moment().valueOf()}.${ext}`
+
+    // const dir = `./src/assets/uploads/${id}/profile-picture`
+    fs.mkdirSync(dir, { recursive: true })
+    const path = `${dir}/${profile_picture}`;
+
+    // Move the file to the specified destination
+    file.mv(path, async (err) => {
+      if (err) {
+        return myres(res, 400, 'error while moving file', err)
+      }
+    });
+    return profile_picture
+  },
+  hashPassword: async (password) => {
+    try {
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      return hashedPassword;
+    } catch (error) {
+      throw error;
+    }
+  },
 }
