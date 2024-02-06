@@ -1,4 +1,8 @@
+const fs = require('fs');
 const { Op } = require("sequelize")
+const bcrypt = require('bcrypt');
+const moment = require('moment');
+const saltRounds = 13;
 
 module.exports = {
   myPagination: (q, sqInc) => {
@@ -176,4 +180,12 @@ module.exports = {
       throw error;
     }
   },
+  comparePassword: async (password, hashedPassword) => {
+    try {
+      const match = await bcrypt.compare(password, hashedPassword);
+      return match;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
