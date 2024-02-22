@@ -39,10 +39,12 @@ export const useDepartmentStore = defineStore('department', {
     },
     async getAllDepartment({ sortBy }) {
       this.loading = true
-      let sort = toRaw(sortBy)
-      console.log('sortBy', toRaw(sortBy));
-      if (sort.length) {
-        this.params.sort = `${sort[0].key},${sort[0].order}`
+      if (sortBy) {
+        let sort = toRaw(sortBy)
+        console.log('sortBy', toRaw(sortBy));
+        if (sort.length) {
+          this.params.sort = `${sort[0].key},${sort[0].order}`
+        }
       }
       try {
         const res = await getAll(this.params)
