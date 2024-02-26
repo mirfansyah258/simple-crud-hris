@@ -88,7 +88,10 @@ import { useDepartmentStore } from '@/stores/department';
 import { storeToRefs } from 'pinia';
 import { ref, toRaw } from 'vue';
 
-const headers= [
+import Swal from 'sweetalert2'
+// import '@sweetalert2/theme-dark';
+
+const headers = [
   { title: 'Department Name', key: 'department_name', },
   { title: 'Parent', key: 'parent_department_name' },
   { title: 'Action', key: 'id' },
@@ -147,9 +150,23 @@ const editItem = (item) => {
   }
 }
 
-const deleteItem = (id) => {
+const deleteItem = async (id) => {
   id = toRaw(id)
-
+  Swal.fire({
+    icon: "warning",
+    title: "Warning",
+    text: "Are you sure want to delete this item?",
+    showCancelButton: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await deleteDepartment(id)
+        Swal.fire("Deleted!", "", "success");
+      } catch (error) {
+        console.error('deleteItem error', error);
+      }
+    }
+  })
 }
 
 const { data, params, form, loading } = storeToRefs(useDepartmentStore())
