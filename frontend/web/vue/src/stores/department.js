@@ -1,6 +1,6 @@
 import { ref, computed, toRaw } from 'vue'
 import { defineStore } from 'pinia'
-import { create, getAll } from '@/apis/department'
+import { create, getAll, update, deleteDepartment as delDept } from '@/apis/department'
 
 export const useDepartmentStore = defineStore('department', {
   state: () => ({
@@ -8,7 +8,7 @@ export const useDepartmentStore = defineStore('department', {
       rows: [],
       totalCount: 0,
       currentPage: 1,
-      perPage: 10,
+      perPage: 1,
       totalPage: 0
     },
     params: {
@@ -16,6 +16,11 @@ export const useDepartmentStore = defineStore('department', {
       perPage: 10,
       searchQuery: '',
       sort: ''
+    },
+    form: {
+      id: '',
+      parent_department_id: '',
+      department_name: ''
     },
     loading: true
   }),
@@ -35,16 +40,21 @@ export const useDepartmentStore = defineStore('department', {
         throw error
       } finally {
         this.loading = false
+        this.getAllDepartment({ sortBy: [] })
       }
     },
-    async getAllDepartment({ sortBy }) {
+    async getAllDepartment(dt) {
       this.loading = true
-      if (sortBy) {
-        let sort = toRaw(sortBy)
-        console.log('sortBy', toRaw(sortBy));
-        if (sort.length) {
-          this.params.sort = `${sort[0].key},${sort[0].order}`
-        }
+      const datatables = toRaw(dt)
+      console.log('datatables', datatables);
+      if (datatables.sortBy.length) {
+        let sort = datatables.sortBy
+        this.params.sort = `${sort[0].key},${sort[0].order}`
+      } else {
+        this.params.sort = ''
+      }
+      if (datatables.page) {
+        this.params.page = datatables.page
       }
       try {
         const res = await getAll(this.params)
@@ -57,6 +67,34 @@ export const useDepartmentStore = defineStore('department', {
       } finally {
         this.loading = false
       }
-    }
+    },
+    async updateDepartment(data) {
+      this.loading = true
+      try {
+        const res = await update(data.id, data)
+        console.log('updateDepartment res', res);
+        return res.data
+      } catch (error) {
+        console.error('update department error', error);
+        throw error
+      } finally {
+        this.loading = false
+        this.getAllDepartment({ sortBy: [] })
+      }
+    },
+    async deleteDepartment(id) {
+      this.loading = true
+      try {
+        const res = await delDept(id)
+        console.log('deleteDepartment res', res);
+        return res.data
+      } catch (error) {
+        console.error('delete department error', error);
+        throw error
+      } finally {
+        this.loading = false
+        this.getAllDepartment({ sortBy: [] })
+      }
+    },
   }
 })

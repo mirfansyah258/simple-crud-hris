@@ -11,7 +11,7 @@
       </v-card-title>
 
       <v-row justify="end" class="mt-1">
-        <v-col lg="3" md="4" sm="6" xs="12">
+        <v-col xl="2" lg="3" md="4" sm="6" xs="12">
           <v-text-field
             :loading="loading"
             density="compact"
@@ -34,6 +34,21 @@
         :loading="loading"
         @update:options="getAllDepartment"
       >
+      <template v-slot:item.id="{ item }">
+        <v-icon
+          size="small"
+          class="me-2"
+          @click="editItem(item)"
+        >
+          mdi-pencil
+        </v-icon>
+        <v-icon
+          size="small"
+          @click="deleteItem(item.id)"
+        >
+          mdi-delete
+        </v-icon>
+      </template>
       </v-data-table-server>
     </v-card-item>
   </v-card>
@@ -71,20 +86,16 @@
 <script setup>
 import { useDepartmentStore } from '@/stores/department';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
 
 const headers= [
   { title: 'Department Name', key: 'department_name', },
   { title: 'Parent', key: 'parent_department_name' },
-  { title: 'Action' },
+  { title: 'Action', key: 'id' },
 ]
 
 const tmpQuery = ref('')
 const dialog = ref(false)
-const form = ref({
-  parent_department_id: '',
-  department_name: ''
-})
 const rules = [
   value => {
     if (value) return true
@@ -106,16 +117,41 @@ const handleSubmit = async () => {
   console.log('form', form.value.department_name);
   if (form.value.department_name) {
     try {
-      await addDepartment(form.value)
-      getAllDepartment({ sortBy: [] })
+      if (form.value.id) { // update
+        await updateDepartment(form.value)
+      } else { //create
+        await addDepartment(form.value)
+      }
     } catch (error) {
       console.error('handleSubmit error', error);
     } finally {
+      // getAllDepartment({ sortBy: [] })
       dialog.value = false
+      form.value = {
+        id: '',
+        parent_department_id: '',
+        department_name: ''
+      }
     }
   }
 }
 
-const { data, params, loading } = storeToRefs(useDepartmentStore())
-const { getAllDepartment, addDepartment } = useDepartmentStore()
+const editItem = (item) => {
+  dialog.value = true
+  console.log('item', toRaw(item));
+  const data = toRaw(item)
+  form.value = {
+    id: data.id,
+    parent_department_id: data.parent_department_id,
+    department_name: data.department_name
+  }
+}
+
+const deleteItem = (id) => {
+  id = toRaw(id)
+
+}
+
+const { data, params, form, loading } = storeToRefs(useDepartmentStore())
+const { getAllDepartment, addDepartment, updateDepartment, deleteDepartment } = useDepartmentStore()
 </script>
