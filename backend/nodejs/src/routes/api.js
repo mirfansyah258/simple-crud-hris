@@ -10,7 +10,7 @@ const { auth: authMiddleware } = require('../middleware');
 // ... other resource routes
 
 // Mount the resource-specific routes
-router.use('/department', authMiddleware.introspect, departmentRoutes);
+router.use('/department', departmentRoutes);
 router.use('/position', authMiddleware.introspect, positionRoutes);
 router.use('/employee', authMiddleware.introspect, employeeRoutes);
 router.use('/auth', authRoutes);

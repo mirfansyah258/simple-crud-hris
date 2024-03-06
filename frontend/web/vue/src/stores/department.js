@@ -11,6 +11,10 @@ export const useDepartmentStore = defineStore('department', {
       perPage: 1,
       totalPage: 0
     },
+    all: {
+      data: [],
+      loading: false
+    },
     params: {
       page: 1,
       perPage: 10,
@@ -40,10 +44,10 @@ export const useDepartmentStore = defineStore('department', {
         throw error
       } finally {
         this.loading = false
-        this.getAllDepartment({ sortBy: [] })
+        this.getDtDepartment({ sortBy: [] })
       }
     },
-    async getAllDepartment(dt) {
+    async getDtDepartment(dt) {
       this.loading = true
       const datatables = toRaw(dt)
       console.log('datatables', datatables);
@@ -62,10 +66,27 @@ export const useDepartmentStore = defineStore('department', {
         console.log('data', res.data.data);
         this.data = res.data.data
       } catch (error) {
-        console.error('getAll department error', error);
+        console.error('getDt department error', error);
         throw error
       } finally {
         this.loading = false
+      }
+    },
+    async getAllDepartment(perPage = 1000) {
+      this.all.loading = true
+      try {
+        const res = await getAll({
+          page: 1,
+          perPage,
+          searchQuery: '',
+          sort: ''
+        })
+        this.all.data = res.data.data.rows
+      } catch (error) {
+        console.error('getAll department error', error);
+        throw error
+      } finally {
+        this.all.loading = false
       }
     },
     async updateDepartment(data) {
@@ -79,7 +100,7 @@ export const useDepartmentStore = defineStore('department', {
         throw error
       } finally {
         this.loading = false
-        this.getAllDepartment({ sortBy: [] })
+        this.getDtDepartment({ sortBy: [] })
       }
     },
     async deleteDepartment(id) {
@@ -93,7 +114,7 @@ export const useDepartmentStore = defineStore('department', {
         throw error
       } finally {
         this.loading = false
-        this.getAllDepartment({ sortBy: [] })
+        this.getDtDepartment({ sortBy: [] })
       }
     },
   }

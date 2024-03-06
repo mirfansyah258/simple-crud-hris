@@ -32,7 +32,7 @@
         :items-length="data.totalCount"
         :items="data.rows"
         :loading="loading"
-        @update:options="getAllDepartment"
+        @update:options="getDtDepartment"
       >
       <template v-slot:item.id="{ item }">
         <v-icon
@@ -62,10 +62,12 @@
         <v-card-text>
           <v-autocomplete
             label="Parent Department"
-            :items="getSelectData()"
+            :items="all.data"
             item-title="department_name"
             item-value="id"
             v-model="form.parent_department_id"
+            @update:focused="getSelectData"
+            :loading="all.loading"
           ></v-autocomplete>
           <v-text-field
             label="Department Name*"
@@ -76,7 +78,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey" @click="dialog = false">Close</v-btn>
-          <v-btn color="primary" type="submit">Submit</v-btn>
+          <v-btn color="primary" @click="getSelectData()">Submit</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -106,14 +108,10 @@ const rules = [
     return 'You must enter a department name.'
   },
 ]
+const selectLoading = ref(true)
 
-const getSelectData = () => {
-  if (data.totalCount > params.perPage) {
-    params.perPage = data.totalCount
-    getAllDepartment()
-    return data.rows
-  }
-  return data.value.rows
+const getSelectData = (e) => {
+  e && getAllDepartment()
 }
 
 const handleSubmit = async () => {
@@ -128,7 +126,7 @@ const handleSubmit = async () => {
     } catch (error) {
       console.error('handleSubmit error', error);
     } finally {
-      // getAllDepartment({ sortBy: [] })
+      // getDtDepartment({ sortBy: [] })
       dialog.value = false
       form.value = {
         id: '',
@@ -169,6 +167,6 @@ const deleteItem = async (id) => {
   })
 }
 
-const { data, params, form, loading } = storeToRefs(useDepartmentStore())
-const { getAllDepartment, addDepartment, updateDepartment, deleteDepartment } = useDepartmentStore()
+const { data, all, params, form, loading } = storeToRefs(useDepartmentStore())
+const { getDtDepartment, getAllDepartment, addDepartment, updateDepartment, deleteDepartment } = useDepartmentStore()
 </script>
