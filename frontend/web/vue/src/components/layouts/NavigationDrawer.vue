@@ -9,6 +9,7 @@
     <v-list density="compact" nav>
       <v-list-item prepend-icon="mdi-home" title="Dashboard" value="dashboard" to="/"></v-list-item>
       <v-list-item prepend-icon="mdi-account-multiple" title="Department" value="department" to="/department"></v-list-item>
+      <v-list-item prepend-icon="mdi-chair-rolling" title="Position" value="position" to="/position"></v-list-item>
     </v-list>
     
   </v-navigation-drawer>

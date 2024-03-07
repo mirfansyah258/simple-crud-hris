@@ -28,13 +28,13 @@ module.exports = {
     const { queryAll, queryCount, param: replacements } = myPaginationQuery(req.query, 'is_deleted = false ', null, ['position_name', 'department_name'], ['position_name', 'department_name', 'is_head'])
     try {
       // get all record based on filter
-      const data = await db.query(`SELECT * FROM v_position WHERE ${queryAll}`, { replacements, type: QueryTypes.SELECT })
+      const rows = await db.query(`SELECT * FROM v_position WHERE ${queryAll}`, { replacements, type: QueryTypes.SELECT })
 
       // count all record based on filter
       const count = await db.query(`SELECT * FROM v_position WHERE ${queryCount}`, { replacements, type: QueryTypes.SELECT })
       const totalCount = count.length
 
-      return myres(res, 200, null, { data, totalCount, currentPage: parseInt(page), perPage: parseInt(perPage), totalPages: Math.ceil(totalCount / parseInt(perPage)) })
+      return myres(res, 200, null, { rows, totalCount, currentPage: parseInt(page), perPage: parseInt(perPage), totalPages: Math.ceil(totalCount / parseInt(perPage)) })
     } catch (error) {
       console.error('error', error);
       return myres(res, 400, 'error at getAll', error)
