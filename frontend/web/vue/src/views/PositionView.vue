@@ -6,7 +6,7 @@
         <v-btn
           variant="tonal"
           prepend-icon="mdi-plus"
-          @click="dialog = true"
+          @click="dialog = true; getAllDepartment()"
         >Add</v-btn>
       </v-card-title>
 
@@ -83,19 +83,26 @@
             item-title="department_name"
             item-value="id"
             v-model="form.department_id"
-            @update:focused="getSelectData"
+
             :loading="all.loading"
+            :rules="deptRules"
           ></v-autocomplete>
           <v-text-field
             label="Position Name*"
             v-model="form.position_name"
             :rules="posNameRules"
           ></v-text-field>
+          <v-switch
+            v-model="form.is_head"
+            color="primary"
+            label="Is Head"
+            hide-details
+          ></v-switch>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey" @click="dialog = false">Close</v-btn>
-          <v-btn color="primary" @click="getSelectData()">Submit</v-btn>
+          <v-btn color="primary" type="submit">Submit</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -109,7 +116,6 @@ import { storeToRefs } from 'pinia';
 import { ref, toRaw } from 'vue';
 
 import Swal from 'sweetalert2'
-// import '@sweetalert2/theme-dark';
 
 const headers = [
   { title: 'Position Name', key: 'position_name', },
@@ -134,11 +140,6 @@ const deptRules = [
     return 'You must enter a department.'
   },
 ]
-const selectLoading = ref(true)
-
-const getSelectData = (e) => {
-  e && getAllDepartment()
-}
 
 const handleSubmit = async () => {
   console.log('form', form.value.position_name);
@@ -151,6 +152,11 @@ const handleSubmit = async () => {
       }
     } catch (error) {
       console.error('handleSubmit error', error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response.data.error,
+      })
     } finally {
       // getDtPosition({ sortBy: [] })
       dialog.value = false
@@ -164,14 +170,19 @@ const handleSubmit = async () => {
 }
 
 const editItem = (item) => {
-  dialog.value = true
-  console.log('item', toRaw(item));
-  const data = toRaw(item)
-  form.value = {
-    id: data.id,
-    parent_position_id: data.parent_position_id,
-    position_name: data.position_name
-  }
+  getAllDepartment().then(() => {
+    dialog.value = true
+    console.log('item', toRaw(item));
+    const data = toRaw(item)
+
+    form.value = {
+      id: data.id,
+      parent_position_id: data.parent_position_id,
+      department_id: data.department_id,
+      position_name: data.position_name,
+      is_head: data.is_head
+    }
+  })
 }
 
 const deleteItem = async (id) => {
@@ -193,7 +204,7 @@ const deleteItem = async (id) => {
   })
 }
 
-const { all } = storeToRefs(usePositionStore())
+const { all } = storeToRefs(useDepartmentStore())
 const { getAllDepartment } = useDepartmentStore()
 
 const { data, params, form, loading } = storeToRefs(usePositionStore())

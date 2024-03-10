@@ -50,19 +50,22 @@ export const usePositionStore = defineStore('position', {
     },
     async getDtPosition(dt) {
       this.loading = true
-      const datatables = toRaw(dt)
-      console.log('datatables', datatables);
-
       this.params.sort = ''
-      if ('sortBy' in datatables) {
-        if (datatables.sortBy.length) {
-          let sort = datatables.sortBy
-          this.params.sort = `${sort[0].key},${sort[0].order}`
+      
+      if (dt) {
+        const datatables = toRaw(dt)
+        console.log('datatables', datatables);
+        if ('sortBy' in datatables) {
+          if (datatables.sortBy.length) {
+            let sort = datatables.sortBy
+            this.params.sort = `${sort[0].key},${sort[0].order}`
+          }
+        }
+        if (datatables.page) {
+          this.params.page = datatables.page
         }
       }
-      if (datatables.page) {
-        this.params.page = datatables.page
-      }
+
       try {
         const res = await getAll(this.params)
         console.log('res', res);

@@ -6,7 +6,7 @@
         <v-btn
           variant="tonal"
           prepend-icon="mdi-plus"
-          @click="dialog = true"
+          @click="dialog = true; getAllDepartment()"
         >Add</v-btn>
       </v-card-title>
 
@@ -78,7 +78,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey" @click="dialog = false">Close</v-btn>
-          <v-btn color="primary" @click="getSelectData()">Submit</v-btn>
+          <v-btn color="primary" type="submit">Submit</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -108,11 +108,6 @@ const rules = [
     return 'You must enter a department name.'
   },
 ]
-const selectLoading = ref(true)
-
-const getSelectData = (e) => {
-  e && getAllDepartment()
-}
 
 const handleSubmit = async () => {
   console.log('form', form.value.department_name);
@@ -125,6 +120,11 @@ const handleSubmit = async () => {
       }
     } catch (error) {
       console.error('handleSubmit error', error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response.data.error,
+      })
     } finally {
       // getDtDepartment({ sortBy: [] })
       dialog.value = false
@@ -138,14 +138,16 @@ const handleSubmit = async () => {
 }
 
 const editItem = (item) => {
-  dialog.value = true
-  console.log('item', toRaw(item));
-  const data = toRaw(item)
-  form.value = {
-    id: data.id,
-    parent_department_id: data.parent_department_id,
-    department_name: data.department_name
-  }
+  getAllDepartment().then(() => {
+    dialog.value = true
+    console.log('item', toRaw(item));
+    const data = toRaw(item)
+    form.value = {
+      id: data.id,
+      parent_department_id: data.parent_department_id,
+      department_name: data.department_name
+    }
+  })
 }
 
 const deleteItem = async (id) => {

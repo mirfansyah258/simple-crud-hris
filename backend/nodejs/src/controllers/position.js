@@ -10,7 +10,7 @@ module.exports = {
     try {
       if(is_head === true) {
         const check1 = await Position.findOne({ where: { department_id, is_head } })
-        if (check1) return myres(res, 400, 'error at create', `Selected department in selected company already have a position head (${check1.toJSON().position_name})`)
+        if (check1) return myres(res, 400, 'error at create', `Selected department already have a position head (${check1.toJSON().position_name})`)
       }
       
       const check2 = await isDataExist(Department, department_id, true)
@@ -64,17 +64,17 @@ module.exports = {
         // check if selected department in selected company already have a position head
         if (is_head === true) {
           const check1 = await Position.findOne({ where: { id: { [Op.ne]: id }, department_id, is_head } })
-          if (check1) return myres(res, 400, `Selected department in selected company already have a position head (${check1.toJSON().position_name})`)
+          if (check1) return myres(res, 400, 'error at update', `Selected department already have a position head (${check1.toJSON().position_name})`)
         }
 
         // check if department is exist
         const check2 = await isDataExist(Department, department_id, true)
-        if (check2 < 1) return myres(res, 404, `Department with id ${department_id} is not found`)
+        if (check2 < 1) return myres(res, 404, 'error at update', `Department with id ${department_id} is not found`)
 
         const data = await Position.update({ position_name, department_id, is_head }, { where: { id }, returning: true })
         return myres(res, 200, 'Position changed successfully', data[1][0])
       }
-      return myres(res, 404, `Position with id ${id} is not found`)
+      return myres(res, 404, 'error at update', `Position with id ${id} is not found`)
     } catch (error) {
       console.error('error', error);
       return myres(res, 400, 'error at update', error)
@@ -88,7 +88,7 @@ module.exports = {
         const data = await Position.update({ is_head: false, is_deleted: true }, { where: { id }, returning: true })
         return myres(res, 200, 'Position data deleted successfully', data[1][0])
       }
-      return myres(res, 404, `Position with id ${id} is not found`)
+      return myres(res, 404, 'error at delete', `Position with id ${id} is not found`)
     } catch (error) {
       console.error('error', error);
       return myres(res, 400, 'error at delete', error)
