@@ -42,13 +42,13 @@ response.getAll = async (req, res) => {
   const { queryAll, queryCount, param: replacements } = myPaginationQuery(req.query, `status = '${status}' `, null, ['emp_number', 'fullname', 'position_name', 'department_name', 'status'])
   try {
     // get all record based on filter
-    const data = await db.query(`SELECT *, (CASE WHEN (profile_picture = '') IS NOT TRUE THEN '/uploads/' || id || '/profile-picture/' || profile_picture ELSE '' END) AS profile_picture_path FROM v_employee WHERE ${queryAll}`, { replacements, type: QueryTypes.SELECT })
+    const rows = await db.query(`SELECT *, (CASE WHEN (profile_picture = '') IS NOT TRUE THEN '/uploads/' || id || '/profile-picture/' || profile_picture ELSE '' END) AS profile_picture_path FROM v_employee WHERE ${queryAll}`, { replacements, type: QueryTypes.SELECT })
 
     // count all record based on filter
     const count = await db.query(`SELECT * FROM v_employee WHERE ${queryCount}`, { replacements, type: QueryTypes.SELECT })
     const totalCount = count.length
 
-    return myres(res, 200, null, { data, totalCount, currentPage: parseInt(page), perPage: parseInt(perPage), totalPages: Math.ceil(totalCount / parseInt(perPage)) })
+    return myres(res, 200, null, { rows, totalCount, currentPage: parseInt(page), perPage: parseInt(perPage), totalPages: Math.ceil(totalCount / parseInt(perPage)) })
   } catch (error) {
     console.error('error', error);
     return myres(res, 400, 'error at getAll', error)
