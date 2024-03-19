@@ -24,10 +24,24 @@ export const useEmployeeStore = defineStore('employee', {
     },
     form: {
       id: '',
-      position_name: '',
-      department_id: '',
-      is_head: false
+      emp_number: '',
+      id_card_number: '',
+      firstname: '',
+      lastname: '',
+      birthdate: null,
+      gender: '',
+      marital_status: false,
+      address: '',
+      phone: '',
+      email: '',
+      emergency_contact_name: '',
+      emergency_contact_phone: '',
+      join_date: '',
+      end_date: '',
+      position_id: '',
+      password: ''
     },
+    formData: null,
     loading: true
   }),
   getters: {
